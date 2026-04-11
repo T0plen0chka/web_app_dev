@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mt-5 text-center">Cookie</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">Управление cookie</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <strong>Текущее состояние:</strong><br>
+                    {% if cookie_value %}
+                        Cookie <code>test_cookie</code> установлен со значением: <code>{{ cookie_value }}</code><br>
+                        <span class="text-muted">При следующем обновлении страницы cookie будет удален.</span>
+                    {% else %}
+                        Cookie <code>test_cookie</code> не установлен.<br>
+                        <span class="text-muted">При обновлении страницы cookie будет установлен.</span>
+                    {% endif %}
+                </div>
+                <p class="mt-3">
+                    <strong>Механизм работы:</strong> При каждом посещении этой страницы проверяется наличие cookie 
+                    <code>test_cookie</code>. Если cookie отсутствует - он устанавливается. Если присутствует - удаляется.
+                </p>
+                <a href="{{ url_for('cookies_page') }}" class="btn btn-primary">Обновить страницу</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

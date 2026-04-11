@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mt-5 text-center">Параметры URL</h1>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Параметры запроса</h5>
+            </div>
+            <div class="card-body">
+                {% if params %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Название параметра</th>
+                                    <th>Значение</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for key, value in params.items() %}
+                                <tr>
+                                    <td><code>{{ key }}</code></td>
+                                    <td><code>{{ value }}</code></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Параметры URL не переданы. Попробуйте добавить параметры в адресную строку, например: <code>?name=Иван&age=25&city=Москва</code>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

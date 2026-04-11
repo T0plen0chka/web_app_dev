@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="mt-5 text-center">Об авторе</h1>
+<div class="row mt-4">
+    <div class="col-md-4 mb-3 text-center">
+        <img class="img-fluid rounded-circle border shadow-sm" src="{{ url_for('static', filename='images/avatar.jpg') }}" alt="Author" style="width: 250px; height: 250px; object-fit: cover;">
+    </div>
+    <div class="col-md-8 d-flex align-items-center">
+        <div class="p-3 bg-light rounded border">
+            <p class="lead">
+                Здравствуйте! Я студент курса по информационной безопасности. 
+                Данное веб-приложение разработано в рамках выполнения лабораторной работы №2
+                по дисциплине "Разработка веб-приложений".
+            </p>
+            <p>
+                В ходе работы были изучены основы Flask, работа с шаблонами Jinja2, 
+                проектирование структур данных и написание автоматизированных тестов с использованием Pytest.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
