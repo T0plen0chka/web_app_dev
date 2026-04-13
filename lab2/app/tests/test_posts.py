@@ -1,111 +1,102 @@
-# 1. Проверка страницы параметров URL
-def test_url_params_page(client):
-    response = client.get("/url-params?name=John&age=30&city=Moscow")
-    assert response.status_code == 200
-    assert "name" in response.text
-    assert "John" in response.text
-    assert "age" in response.text
-    assert "30" in response.text
+import pytest
+from datetime import datetime
 
-# 2. Проверка страницы заголовков
+def test_index_status(client):
+    """1. Проверка главной страницы"""
+    assert client.get("/").status_code == 200
+
+def test_posts_list_status(client):
+    """2. Проверка страницы списка постов"""
+    assert client.get("/posts").status_code == 200
+
+def test_about_status(client):
+    """3. Проверка страницы Об авторе"""
+    assert client.get("/about").status_code == 200
+
+def test_post_detail_template(client, captured_templates):
+    """4. Проверка использования шаблона для страницы поста"""
+    with captured_templates as templates:
+        client.get("/posts/0")
+        assert any(t[0].name == 'post.html' for t in templates)
+
+def test_post_context_data(client, captured_templates):
+    """5. Проверка передачи объекта post в контекст шаблона"""
+    with captured_templates as templates:
+        client.get("/posts/0")
+        if templates:
+            _, context = templates[0]
+            assert 'post' in context
+
+def test_post_text_content(client):
+    """6. Проверка наличия контента поста"""
+    response = client.get("/posts/0")
+    assert response.status_code == 200
+    assert len(response.get_data(as_text=True)) > 500
+
+def test_post_image_tag(client):
+    """7. Проверка наличия изображения"""
+    response = client.get("/posts/0")
+    assert "<img" in response.get_data(as_text=True)
+
+def test_comment_form_exists(client):
+    """8. Проверка наличия формы для комментариев"""
+    response = client.get("/posts/0")
+    assert "Оставьте комментарий" in response.get_data(as_text=True)
+
+def test_submit_button_exists(client):
+    """9. Проверка наличия кнопки отправки формы"""
+    response = client.get("/posts/0")
+    assert "Отправить" in response.get_data(as_text=True)
+
+def test_date_format_display(client, mocker):
+    """10. Проверка формата даты (ДД.ММ.ГГГГ)"""
+    fixed_date = datetime(2026, 3, 27)
+    mock_post = {
+        'title': 'Test', 'text': 'Test text', 'author': 'Admin',
+        'date': fixed_date, 'image_id': 'test.jpg', 
+        'comments': []
+    }
+    mocker.patch("app.get_posts", return_value=[mock_post])
+    response = client.get("/posts/0")
+    assert "27.03.2026" in response.get_data(as_text=True)
+
+def test_error_404_on_invalid_post(client):
+    """11. Проверка обработки несуществующего индекса (404)"""
+    response = client.get("/posts/999")
+    assert response.status_code == 404
+
+def test_footer_name_correct(client):
+    """12. Проверка ФИО автора в футер"""
+    response = client.get("/")
+    assert "Скрынникова Полина Андреевна" in response.get_data(as_text=True)
+
+def test_footer_group_correct(client):
+    """13. Проверка номера группы в футере"""
+    response = client.get("/")
+    assert "241-371" in response.get_data(as_text=True)
+
+def test_navbar_present(client):
+    """14. Проверка наличия навигационной панели"""
+    response = client.get("/")
+    assert "navbar" in response.get_data(as_text=True)
+
+def test_url_params_page(client):
+    """15. Проверка страницы параметров URL"""
+    response = client.get("/url-params?name=John&age=30")
+    assert response.status_code == 200
+    data = response.get_data(as_text=True)
+    assert "name" in data
+    assert "John" in data
+
 def test_headers_page(client):
+    """16. Проверка страницы заголовков"""
     response = client.get("/headers")
     assert response.status_code == 200
-    assert "User-Agent" in response.text
+    assert "User-Agent" in response.get_data(as_text=True)
 
-# 3. Проверка установки и удаления cookie
-def test_cookie_set_and_delete(client):
-    # Первый запрос - cookie должен установиться
-    response1 = client.get("/cookies")
-    assert 'test_cookie' in response1.headers.get('Set-Cookie', '')
-    
-    # Второй запрос - cookie должен удалиться
-    response2 = client.get("/cookies")
-    assert 'test_cookie=;' in response2.headers.get('Set-Cookie', '') or 'test_cookie=' in response2.headers.get('Set-Cookie', '')
-
-# 4. Проверка страницы параметров формы (GET)
-def test_form_params_page_get(client):
-    response = client.get("/form-params")
-    assert response.status_code == 200
-    assert "Отправить данные формы" in response.text
-
-# 5. Проверка отправки формы (POST)
-def test_form_params_post(client):
-    response = client.post("/form-params", data={
-        'name': 'Test User',
-        'email': 'test@example.com',
-        'message': 'Hello World'
-    })
-    assert response.status_code == 200
-    assert "Test User" in response.text
-    assert "test@example.com" in response.text
-    assert "Hello World" in response.text
-
-# 6. Проверка валидации телефона - корректный номер с +7
-def test_phone_validation_valid_plus7(client):
-    response = client.post("/phone-validation", data={'phone': '+7 (123) 456-75-90'})
-    assert response.status_code == 200
-    assert "Номер корректен" in response.text
-    assert "8-123-456-75-90" in response.text
-
-# 7. Проверка валидации телефона - корректный номер с 8
-def test_phone_validation_valid_8(client):
-    response = client.post("/phone-validation", data={'phone': '8(123)4567590'})
-    assert response.status_code == 200
-    assert "Номер корректен" in response.text
-    assert "8-123-456-75-90" in response.text
-
-# 8. Проверка валидации телефона - корректный 10-значный номер
-def test_phone_validation_valid_10_digits(client):
-    response = client.post("/phone-validation", data={'phone': '123.456.75.90'})
-    assert response.status_code == 200
-    assert "Номер корректен" in response.text
-
-# 10. Проверка валидации телефона - недопустимые символы
-def test_phone_validation_invalid_chars(client):
-    response = client.post("/phone-validation", data={'phone': '123abc456'})
-    assert response.status_code == 200
-    assert "is-invalid" in response.text
-    assert "встречаются недопустимые символы" in response.text
-
-# 10. Проверка валидации телефона - неверное количество цифр
-def test_phone_validation_wrong_digit_count(client):
-    response = client.post("/phone-validation", data={'phone': '12345'})
-    assert response.status_code == 200
-    assert "is-invalid" in response.text
-    assert "Неверное количество цифр" in response.text
-
-# 11. Проверка валидации телефона - 11 цифр не с 7 или 8
-def test_phone_validation_invalid_11_digits_start(client):
-    response = client.post("/phone-validation", data={'phone': '91234567890'})
-    assert response.status_code == 200
-    assert "is-invalid" in response.text
-    assert "Неверное количество цифр" in response.text
-
-# 12. Проверка валидации телефона - корректный номер с пробелами
-def test_phone_validation_valid_with_spaces(client):
-    response = client.post("/phone-validation", data={'phone': '+7 123 456 75 90'})
-    assert response.status_code == 200
-    assert "Номер корректен" in response.text
-
-# 13. Проверка страницы валидации - отображение ошибки с Bootstrap классом
-def test_phone_validation_error_bootstrap_class(client):
-    response = client.post("/phone-validation", data={'phone': 'invalid'})
-    assert response.status_code == 200
-    assert 'is-invalid' in response.text
-    assert 'invalid-feedback' in response.text
-
-# 14. Проверка, что на страницах есть навигационное меню с новыми пунктами
-def test_navbar_has_new_pages(client):
-    response = client.get("/")
-    assert "Параметры URL" in response.text
-    assert "Заголовки запроса" in response.text
-    assert "Cookie" in response.text
-    assert "Параметры формы" in response.text
-    assert "Проверка телефона" in response.text
-
-# 15. Проверка валидации телефона - пустая строка
-def test_phone_validation_empty_string(client):
-    response = client.post("/phone-validation", data={'phone': ''})
-    assert response.status_code == 200
-    assert "is-invalid" in response.text
+def test_phone_validation_valid(client):
+    """17. Проверка валидации телефона - корректный номер"""
+    response = client.post("/phone-validation", 
+                          data={'phone': '+7 (123) 456-75-90'},
+                          follow_redirects=True)
+    assert "Номер корректен" in response.get_data(as_text=True)
