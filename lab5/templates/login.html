@@ -1,0 +1,58 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="card">
+      <div class="card-header text-center">
+        <i class="bi bi-box-arrow-in-right" style="font-size: 2rem;"></i>
+        <h4 class="mt-2 mb-0">Добро пожаловать!</h4>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST">
+          <div class="mb-3">
+            <label for="username" class="form-label">
+              <i class="bi bi-person"></i> Логин
+            </label>
+            <input type="text" class="form-control" id="username" name="username" 
+                   placeholder="Введите ваш логин" required autofocus>
+          </div>
+          
+          <div class="mb-3">
+            <label for="password" class="form-label">
+              <i class="bi bi-lock"></i> Пароль
+            </label>
+            <input type="password" class="form-control" id="password" name="password" 
+                   placeholder="Введите пароль" required>
+          </div>
+          
+          <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+            <label class="form-check-label" for="remember">
+              <i class="bi bi-bookmark-check"></i> Запомнить меня
+            </label>
+          </div>
+          
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-unlock-fill"></i> Войти в систему
+            </button>
+          </div>
+        </form>
+        
+        <hr class="my-4">
+        
+        <div class="alert alert-info small mb-0">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          <strong>Тестовые данные:</strong><br>
+          <span class="d-block mt-2">
+            <i class="bi bi-shield-fill-check text-danger"></i> Администратор: <code>admin</code> / <code>Admin123!</code><br>
+            <i class="bi bi-person"></i> Пользователь: <code>user1</code> / <code>User123!</code><br>
+            <i class="bi bi-person"></i> Пользователь: <code>user2</code> / <code>User456!</code>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,68 +1,72 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="my-4">{% if user %}Редактирование пользователя{% else %}Создание пользователя{% endif %}</h1>
-
 <div class="row justify-content-center">
     <div class="col-md-6">
-        <form method="post">
-            {% if not user %}
-            <div class="mb-3">
-                <label class="form-label">Логин *</label>
-                <input type="text" name="login" class="form-control {% if errors.login %}is-invalid{% endif %}" 
-                       value="{{ form_data.login or '' }}" required>
-                {% if errors.login %}
-                    <div class="invalid-feedback">{{ errors.login }}</div>
-                {% endif %}
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">{{ title }}</h4>
             </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Пароль *</label>
-                <input type="password" name="password" class="form-control {% if errors.password %}is-invalid{% endif %}" required>
-                {% if errors.password %}
-                    <div class="invalid-feedback">{{ errors.password }}</div>
-                {% endif %}
-                <small class="form-text text-muted">Минимум 8 символов, заглавная и строчная буква, цифра, без пробелов</small>
+            <div class="card-body">
+                <form method="post">
+                    {% if not edit_mode %}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else "")) }}
+                        {% for error in form.username.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else "")) }}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                        <small class="form-text text-muted">
+                            Пароль: не менее 8 символов, заглавная и строчная буквы, цифра, только латиница/кириллица и спецсимволы (~!?@#$%^&*_-+()[]{}><\/|"\'.,:;)
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        {{ form.last_name.label(class="form-label") }}
+                        {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                        {% for error in form.last_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.first_name.label(class="form-label") }}
+                        {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                        {% for error in form.first_name.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.patronymic.label(class="form-label") }}
+                        {{ form.patronymic(class="form-control" + (" is-invalid" if form.patronymic.errors else "")) }}
+                        {% for error in form.patronymic.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.role_id.label(class="form-label") }}
+                        {{ form.role_id(class="form-select" + (" is-invalid" if form.role_id.errors else "")) }}
+                        {% for error in form.role_id.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+                </form>
             </div>
-            {% endif %}
-            
-            <div class="mb-3">
-                <label class="form-label">Фамилия</label>
-                <input type="text" name="last_name" class="form-control" value="{{ form_data.last_name or '' }}">
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Имя *</label>
-                <input type="text" name="first_name" class="form-control {% if errors.first_name %}is-invalid{% endif %}" 
-                       value="{{ form_data.first_name or '' }}" required>
-                {% if errors.first_name %}
-                    <div class="invalid-feedback">{{ errors.first_name }}</div>
-                {% endif %}
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Отчество</label>
-                <input type="text" name="middle_name" class="form-control" value="{{ form_data.middle_name or '' }}">
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label">Роль *</label>
-                <select name="role_id" class="form-control {% if errors.role_id %}is-invalid{% endif %}">
-                    <option value="">Выберите роль</option>
-                    {% for role in roles %}
-                        <option value="{{ role.id }}" {% if form_data.role_id|string == role.id|string %}selected{% endif %}>
-                            {{ role.name }} - {{ role.description or '' }}
-                        </option>
-                    {% endfor %}
-                </select>
-                {% if errors.role_id %}
-                    <div class="invalid-feedback">{{ errors.role_id }}</div>
-                {% endif %}
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Сохранить</button>
-            <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}
